@@ -1,0 +1,77 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: userId (Auth UID)
+    // Fields:
+    //   - uid: string (required)
+    //   - name: string (required)
+    //   - email: string (required)
+    //   - bloodGroup: string (required)
+    //   - healthIssues: string (optional)
+    //   - role: string (required, 'user' or 'master')
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: verificationCodes
+    // Fields:
+    //   - email: string
+    //   - code: string
+    //   - createdAt: timestamp
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        ((request.auth.token.email != null && (
+           request.auth.token.email.lower() == "naveenkumarkunisetti@gmail.com" ||
+           request.auth.token.email.lower() == "naveenkumarkunisetti@gamil.com"
+         )) ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'master');
+    }
+
+    function isValidUser(data) {
+      return data.uid is string &&
+             data.name is string &&
+             data.email is string &&
+             data.role in ['user', 'master'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      // Everyone can read donor info
+      allow read: if true; 
+      
+      // Allow creation for anyone (authenticated or guest)
+      allow create: if true;
+
+      // Allow update for owner or master
+      allow update: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      
+      allow delete: if isAdmin();
+    }
+
+    match /verificationCodes/{codeId} {
+      // Only master can read/write verification codes
+      allow read, write: if isAdmin();
+    }
+  }
+}

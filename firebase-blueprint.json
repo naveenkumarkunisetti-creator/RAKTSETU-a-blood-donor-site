@@ -1,0 +1,43 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A donor or master user in the system.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID or guest ID (guest_...)" },
+        "name": { "type": "string", "description": "Full name of the user" },
+        "email": { "type": "string", "description": "Email address" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "age": { "type": "number", "description": "Age of the user" },
+        "location": { "type": "string", "description": "Location/Address" },
+        "bloodGroup": { "type": "string", "description": "Blood group (e.g., A+, O-)" },
+        "healthIssues": { "type": "string", "description": "Optional description of health issues" },
+        "role": { "type": "string", "enum": ["user", "master"], "description": "User role" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Registration timestamp" }
+      },
+      "required": ["uid", "name", "email", "phone", "age", "location", "bloodGroup", "role", "createdAt"]
+    },
+    "VerificationCode": {
+      "title": "VerificationCode",
+      "description": "A 6-digit code for master registration verification.",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "code": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["email", "code", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and donor information."
+    },
+    "/verificationCodes/{codeId}": {
+      "schema": "VerificationCode",
+      "description": "Temporary verification codes for master registration."
+    }
+  }
+}
