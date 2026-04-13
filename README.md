@@ -6,7 +6,7 @@
 
 This contains everything you need to run your app locally.
 
-View your app in AI Studio: https://raktset/apps/2d8d63c7-2283-4784-ae67-7df38a1c99dd
+View your app in AI Studio: https://ai.studio/apps/2d8d63c7-2283-4784-ae67-7df38a1c99dd
 
 ## Run Locally
 
